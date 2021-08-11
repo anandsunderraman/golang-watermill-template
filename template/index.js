@@ -17,9 +17,11 @@ import { DiagramContent } from '../components/DiagramContent';
  * Notice that you can pass parameters to components. In fact, underneath, each component is a pure Javascript function.
  */
 export default function({ asyncapi, params }) {
-  if (!asyncapi.hasComponents()) {
-    return null;
-  }
+  // console.log('moving before')
+  // if (!asyncapi.hasComponents()) {
+  //   return null;
+  // }
+  // console.log('moving past')
 
   const cssLinks = [
     'https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css',
@@ -27,18 +29,40 @@ export default function({ asyncapi, params }) {
   ];
 
   // Notice that root component is the `File` component.
+  // return (
+  //   <File name="index.html">
+  //     <HTML>
+  //       <Head 
+  //         title={asyncapi.info().title()}
+  //         cssLinks={cssLinks} 
+  //       />
+  //       <Body>
+  //         <BodyContent asyncapi={asyncapi} />
+  //         <Scripts params={params} />
+  //       </Body>
+  //     </HTML>
+  //   </File>
+  // );
   return (
-    <File name="index.html">
-      <HTML>
-        <Head 
-          title={asyncapi.info().title()}
-          cssLinks={cssLinks} 
-        />
-        <Body>
-          <BodyContent asyncapi={asyncapi} />
-          <Scripts params={params} />
-        </Body>
-      </HTML>
+    <File name="main.go">
+{`
+  package main
+
+  import (
+    "context"
+    "encoding/json"
+    "fmt"
+    "github.com/ThreeDotsLabs/watermill"
+    "github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
+    "github.com/ThreeDotsLabs/watermill/message"
+    "go-watermill-amqp/asyncapi"
+    "time"
+  )
+
+  func main() {
+
+  }
+`}
     </File>
   );
 }

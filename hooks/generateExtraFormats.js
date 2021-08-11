@@ -2,9 +2,9 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 const fs = require('fs');
 
-module.exports = {
-  'generate:after': generatePdfPngSvg
-};
+// module.exports = {
+//   'generate:after': generatePdfPngSvg
+// };
 
 async function generatePdfPngSvg(generator) {
   const targetDir = generator.targetDir;
