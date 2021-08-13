@@ -6,7 +6,7 @@ export function pascalCase(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export default async function({ asyncapi }) {
+export default async function({ asyncapi, params }) {
   let channelWrappers = [];
   const channelEntries = Object.keys(asyncapi.channels()).length ? Object.entries(asyncapi.channels()) : [];
   channelWrappers = channelEntries.map(([channelName, channel]) => {
@@ -30,6 +30,7 @@ import (
   "encoding/json"
   "fmt"
   "github.com/ThreeDotsLabs/watermill/message"
+  "${params.moduleName}/payloads"
   "log"
 )
     `
@@ -39,7 +40,7 @@ func ${channel.operation}(messages <-chan *message.Message) {
     for msg := range messages {
       log.Printf("received message: %s, payload: %s", msg.UUID, string(msg.Payload))
 
-      var m ${channel.publishMessage}
+      var m payloads.${channel.publishMessage}
       err := json.Unmarshal(msg.Payload, &m)
       if err != nil {
         fmt.Printf("error unmarshalling message: %s, err is: %s", msg.Payload, err)

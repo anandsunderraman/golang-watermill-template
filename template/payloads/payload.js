@@ -15,7 +15,7 @@ export default async function({ asyncapi }) {
   ] });
   const models = await generator.generate(asyncapi);
 
-  let payloadContent = "package payload"
+  let payloadContent = "package payloads"
   models.forEach(model => {
     payloadContent = payloadContent + `
     ${model.dependencies.join('\n')}

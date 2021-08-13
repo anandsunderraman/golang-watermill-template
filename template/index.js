@@ -17,32 +17,9 @@ import { DiagramContent } from '../components/DiagramContent';
  * Notice that you can pass parameters to components. In fact, underneath, each component is a pure Javascript function.
  */
 export default function({ asyncapi, params }) {
-  // console.log('moving before')
-  // if (!asyncapi.hasComponents()) {
-  //   return null;
-  // }
-  // console.log('moving past')
+  
+  // console.log(JSON.stringify(params))
 
-  const cssLinks = [
-    'https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css',
-    'style.css',
-  ];
-
-  // Notice that root component is the `File` component.
-  // return (
-  //   <File name="index.html">
-  //     <HTML>
-  //       <Head 
-  //         title={asyncapi.info().title()}
-  //         cssLinks={cssLinks} 
-  //       />
-  //       <Body>
-  //         <BodyContent asyncapi={asyncapi} />
-  //         <Scripts params={params} />
-  //       </Body>
-  //     </HTML>
-  //   </File>
-  // );
   return (
     <File name="main.go">
 {`
@@ -60,7 +37,40 @@ export default function({ asyncapi, params }) {
   )
 
   func main() {
+    var asyncAPIConfig config.AsyncAPIConfig
+    err := envconfig.Process("myapp", &asyncAPIConfig)
+    if err != nil {
+      log.Fatal(err.Error())
+    }
+    server := config.Servers[asyncAPIConfig.ServerName]
+    server.Credentials = config.Credentials{
+      User:     asyncAPIConfig.AMQPUser,
+      Password: asyncAPIConfig.AMQPPassword,
+    }
+    uri, err := config.BuildURI(server)
+    if err != nil {
+      log.Fatal(err.Error())
+    }
 
+    amqpConfig := amqp.NewDurableQueueConfig(uri)
+
+    subscriber, err := amqp.NewSubscriber(
+      amqpConfig,
+      watermill.NewStdLogger(false, false),
+    )
+
+    if err != nil {
+      panic(err)
+    }
+
+    messages, err := subscriber.Subscribe(context.Background(), topic)
+    if err != nil {
+      panic(err)
+    }
+
+    go handlers.OnLightMeasured(messages)
+
+    time.Sleep(2 * time.Second)
   }
 `}
     </File>
