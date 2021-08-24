@@ -23,55 +23,39 @@ export default function({ asyncapi, params }) {
   return (
     <File name="main.go">
 {`
-  package main
+package main
 
-  import (
-    "context"
-    "encoding/json"
-    "fmt"
-    "github.com/ThreeDotsLabs/watermill"
-    "github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp"
-    "github.com/ThreeDotsLabs/watermill/message"
-    "go-watermill-amqp/asyncapi"
-    "time"
-  )
+import (
+  "context"
+  "go-watermill-amqp/config"
+)
 
-  func main() {
-    var asyncAPIConfig config.AsyncAPIConfig
-    err := envconfig.Process("myapp", &asyncAPIConfig)
-    if err != nil {
-      log.Fatal(err.Error())
-    }
-    server := config.Servers[asyncAPIConfig.ServerName]
-    server.Credentials = config.Credentials{
-      User:     asyncAPIConfig.AMQPUser,
-      Password: asyncAPIConfig.AMQPPassword,
-    }
-    uri, err := config.BuildURI(server)
-    if err != nil {
-      log.Fatal(err.Error())
-    }
+func main() {
+  //this must be passed in or created by the app based on the bindings
+  var amqpURI = "amqp://guest:guest@localhost:5672/"
 
-    amqpConfig := amqp.NewDurableQueueConfig(uri)
+  //creating a subscriber
+  amqpSubscriber, err := config.GetAMQPSubscriber(amqpURI)
 
-    subscriber, err := amqp.NewSubscriber(
-      amqpConfig,
-      watermill.NewStdLogger(false, false),
-    )
-
-    if err != nil {
-      panic(err)
-    }
-
-    messages, err := subscriber.Subscribe(context.Background(), topic)
-    if err != nil {
-      panic(err)
-    }
-
-    go handlers.OnLightMeasured(messages)
-
-    time.Sleep(2 * time.Second)
+  if err != nil {
+    panic(err)
   }
+
+  //creating a router
+  router, err := config.GetRouter()
+
+  if err != nil {
+    panic(err)
+  }
+
+  //configuring the subscription handlers
+  config.ConfigureAMQPSubscriptionHandlers(router, amqpSubscriber)
+
+  ctx := context.Background()
+  if err = router.Run(ctx); err != nil {
+    panic(err)
+  }
+}
 `}
     </File>
   );
