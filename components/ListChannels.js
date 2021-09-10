@@ -189,11 +189,11 @@ func GetAMQPURI() string {
   `
 }
 
-export function Server({pubSubFlags}) {
+export function Server({protocolFlags}) {
   
   let configs = []
   let configBlock = ""
-  if (pubSubFlags.hasAMQPPubSub) {
+  if (protocolFlags.hasAMQP) {
     configs.push(AMQPConfig())
   }
 
