@@ -1,5 +1,3 @@
-ag ../asyncapi.yaml ./ -o output -p moduleName=go-amqp
-
 <!--   
 The good readme should be easy to navigate through, therefore remember to add `markdown-toc` to devDependencies of your template and generate a table of contents by using the following script `"generate:readme:toc": "markdown-toc -i README.md"`
 -->
