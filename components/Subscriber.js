@@ -40,8 +40,8 @@ export function Subscriber({subscriberFlags}) {
 package config
 
 import (
-"github.com/ThreeDotsLabs/watermill"
-${importMod}
+    "github.com/ThreeDotsLabs/watermill"
+    ${importMod}
 )
 
 ${subscriberBlock}

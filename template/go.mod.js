@@ -22,14 +22,14 @@ export default function({ asyncapi, params }) {
   return (
     <File name="go.mod">
   {`
-    module ${params.moduleName}
+module ${params.moduleName}
 
-    go ${params.goVersion}
+go ${params.goVersion}
 
-    require (
-      github.com/ThreeDotsLabs/watermill v1.1.1
-      ${dependencies}
-    )
+require (
+  github.com/ThreeDotsLabs/watermill v1.1.1
+  ${dependencies}
+)
   `}
       </File>
     );
