@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 /**
  * Input: parsed asyncapi object
  * Output: object which indicates what protocols are present in the async api document
@@ -27,4 +29,9 @@ export function GetProtocolFlags(asyncapi) {
   protocolFlags.hasAMQP = hasAMQP;
   
   return protocolFlags;
+}
+
+export function pascalCase(string) {
+  string = _.camelCase(string);
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
