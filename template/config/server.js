@@ -1,5 +1,5 @@
 const { File } = require('@asyncapi/generator-react-sdk');
-import { Server } from '../../components/ListChannels';
+import { Server } from '../../components/Server';
 import { GetProtocolFlags } from '../../components/common';
 
 export default async function({ asyncapi }) {
