@@ -1,11 +1,26 @@
-import { File, render } from '@asyncapi/generator-react-sdk';
+import { File } from '@asyncapi/generator-react-sdk';
+import { GetProtocolFlags } from '../components/common';
 
 export default function({ asyncapi, params }) {
-  
-    // console.log(JSON.stringify(params))
-  
-    return (
-      <File name="go.mod">
+
+  let protocolFlags = GetProtocolFlags(asyncapi)
+  let module = []
+  let dependencies = ""
+
+  if ( !protocolFlags.hasAMQP ) {
+    return
+  }
+
+  if (protocolFlags.hasAMQP) {
+    module.push("github.com/ThreeDotsLabs/watermill-amqp v1.1.2")
+  }
+
+  if (module.length > 0) {
+    dependencies = module.join("\n")
+  }
+
+  return (
+    <File name="go.mod">
   {`
     module ${params.moduleName}
 
@@ -13,8 +28,7 @@ export default function({ asyncapi, params }) {
 
     require (
       github.com/ThreeDotsLabs/watermill v1.1.1
-      github.com/ThreeDotsLabs/watermill-amqp v1.1.2
-      github.com/kelseyhightower/envconfig v1.4.0
+      ${dependencies}
     )
   `}
       </File>
