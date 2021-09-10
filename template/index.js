@@ -5,6 +5,19 @@ import { HTML, Head, Body } from '../components/common';
 import { ListChannels } from '../components/ListChannels';
 import { DiagramContent } from '../components/DiagramContent';
 
+//render an AMQP subscriber
+function AMQPSubscriber() {
+  return `
+  amqpSubscriber, err := config.GetAMQPSubscriber(config.GetAMQPURI())
+  if err != nil {
+    fmt.Printf("error creating amqpSubscriber: %s", err)
+    return
+  }
+
+  config.ConfigureAMQPSubscriptionHandlers(router, amqpSubscriber)
+  `
+}
+
 /* 
  * Each template to be rendered must have as a root component a File component,
  * otherwise it will be skipped.
@@ -18,7 +31,36 @@ import { DiagramContent } from '../components/DiagramContent';
  */
 export default function({ asyncapi, params }) {
   
-  // console.log(JSON.stringify(params))
+  const channelEntries = Object.keys(asyncapi.channels()).length ? Object.entries(asyncapi.channels()) : [];
+  //if there are no channels do nothing
+  if (channelEntries.length === 0) {
+      console.log("Since there are no channels in the asyncapi document no code is being generated")
+      return
+  }
+
+  //if there are no subscribers then do nothing
+  let hasAMQPSubscriber = channelEntries.filter(([channelName, channel]) => {
+      return channel.hasPublish() && channel.bindings().amqp
+  }).length > 0;
+
+  if (!hasAMQPSubscriber) {
+      return
+  }
+
+  let subscriberFlags = {
+      hasAMQPSubscriber: hasAMQPSubscriber
+  }
+
+  let subscribers = []
+  let subscriberConfig = ""
+
+  if (subscriberFlags.hasAMQPSubscriber) {
+    subscribers.push(AMQPSubscriber())
+  }
+
+  if ( subscribers.length > 0 ) {
+    subscriberConfig = subscribers.join("\n")
+  }
 
   return (
     <File name="main.go">
@@ -26,36 +68,28 @@ export default function({ asyncapi, params }) {
 package main
 
 import (
-  "context"
-  "go-watermill-amqp/config"
+	"context"
+	"fmt"
+	"${params.moduleName}/config"
 )
 
 func main() {
-  //this must be passed in or created by the app based on the bindings
-  var amqpURI = "amqp://guest:guest@localhost:5672/"
 
-  //creating a subscriber
-  amqpSubscriber, err := config.GetAMQPSubscriber(amqpURI)
-
-  if err != nil {
-    panic(err)
-  }
-
-  //creating a router
   router, err := config.GetRouter()
-
   if err != nil {
-    panic(err)
+    fmt.Printf("error creating watermill router: %s", err)
+    return
   }
 
-  //configuring the subscription handlers
-  config.ConfigureAMQPSubscriptionHandlers(router, amqpSubscriber)
+  ${subscriberConfig}
 
   ctx := context.Background()
   if err = router.Run(ctx); err != nil {
-    panic(err)
+    fmt.Printf("error running watermill router: %s", err)
+    return
   }
 }
+
 `}
     </File>
   );

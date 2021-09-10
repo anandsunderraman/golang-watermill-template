@@ -155,8 +155,6 @@ export function Subscriber({subscriberFlags}) {
   let importMod = ""
   let subscriberBlock = ""
   if (subscriberFlags.hasAMQPSubscriber) {
-    // importMod = importMod + "\n" + "\"github.com/ThreeDotsLabs/watermill-amqp/pkg/amqp\""
-    // subscriberBlock = subscriberBlock + AMQPSubscriber() + "\n"
     modules.push(amqpMod)
     subscribers.push(AMQPSubscriber())
   }

@@ -1,7 +1,7 @@
 const { File } = require('@asyncapi/generator-react-sdk');
 import { Subscriber } from '../../components/ListChannels';
 
-export default async function({ asyncapi, params }) {
+export default async function({ asyncapi }) {
 
     const channelEntries = Object.keys(asyncapi.channels()).length ? Object.entries(asyncapi.channels()) : [];
     //if there are no channels do nothing
