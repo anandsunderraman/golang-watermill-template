@@ -130,10 +130,43 @@ components:
       type: userPassword
 ```
 
+#### Run the following command to generate a golang module
+
 ```bash
 npm install -g @asyncapi/generator
 # clone this repository and navigate to this repository
-ag /path/to/asyncapi.yaml ./ -o output -p moduleName=your-go-module-name
+ag /path/to/asyncapi.yaml ./ -o /path/to/generated-code -p moduleName=your-go-module-name
 ```
+
+#### How to use the generated code
+
+The above code currently generates a golang module that has a AMQP subscriber.
+
+##### Pre-requisites
+To run the generated code the following needs to be installed
+
+1. go 1.16 +
+2. rabbitmq-server
+
+##### Running the code
+
+1. Navigate to the path where the code was generated
+2. Run the following commands to download the dependencies
+```bash
+go mod download
+go mod tidy
+```
+3. Currently the code does not utilize the server bindings to generate the server URI. It is currently hardcoded to point to a local instance of `rabbitmq`. It is hardcoded as `"amqp://guest:guest@localhost:5672/"` at `<generated-code>/config/server.go`. Change it as per your rabbitmq instance requirements
+4. Finally navigate to the root folder of the generated code and run
+```bash
+go run main.go
+```
+5. If you have a local instance of `rabbitmq`, navigate to it using `http://localhost:15672/` with username and password `guest`/ `guest` (These are default rabbitmq credentials). 
+6. Create a queue as per the async api spec
+7. Publish a message to the queue as per the async api spec
+8. Check the output at the terminal where `go run main.go` was running and the published message should be printed
+
+
+
 
 
